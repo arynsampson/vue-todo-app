@@ -1,4 +1,5 @@
 <template>
+  <button @click="testAdd">click</button>
   <div class="home">
     <Form
       addTask="Add task"
@@ -26,7 +27,7 @@ export default {
   data() {
     return {
       modalDisplay: false,
-      tasks: [],
+      tasks: ['aryn'],
     };
   },
   methods: {
@@ -36,11 +37,24 @@ export default {
     addTaskToArr(task) {
       this.tasks.push(task);
     },
+    testAdd() {
+      this.tasks.push('aryn');
+    },
   },
   watch: {
-    tasks() {
-      console.log(1);
+    tasks: {
+      deep: true,
+      handler() {
+        console.log(1);
+      },
     },
   },
 };
 </script>
+
+<style>
+.home {
+  width: 100%;
+  margin: 0 auto;
+}
+</style>

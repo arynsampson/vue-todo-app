@@ -39,7 +39,7 @@ export default {
 <style>
 .tasks-container {
   width: 100%;
-  padding: 15px 30px;
+  margin-top: 2rem;
 }
 
 table {
@@ -55,6 +55,10 @@ td {
   padding: 10px;
 }
 
+td.date-data {
+  font-size: 14px;
+}
+
 .task-data {
   width: 50%;
 }
@@ -63,15 +67,11 @@ td {
   width: 10%;
 }
 
-td.date-data {
-  font-size: 14px;
-}
-
 .tags-data {
-  width: 30%;
+  width: 20%;
 }
 
-.action-items {
-  width: 10%;
+.action-item {
+  width: 3%;
 }
 </style>

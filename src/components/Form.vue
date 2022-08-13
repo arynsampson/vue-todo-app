@@ -3,13 +3,12 @@
     <form>
       <div class="input-wrapper">
         <label for="task"></label>
-        <input type="text" v-model="taskInput" />
+        <input type="text" v-model="taskInput" maxlength="64" />
       </div>
       <div class="input-wrapper">
         <label for="date"></label>
         <input type="date" v-model="dateInput" />
       </div>
-
       <button class="btn" @click="addNewTask">{{ addTask }}</button>
     </form>
   </div>
@@ -45,6 +44,10 @@ export default {
 </script>
 
 <style scoped>
+form {
+  text-align: left;
+  width: 100%;
+}
 .input-wrapper {
   display: inline-block;
   margin: 10px;
