@@ -1,17 +1,16 @@
 <template>
   <div class="form-wrapper">
     <form>
-      <div>
+      <div class="input-wrapper">
         <label for="task"></label>
         <input type="text" v-model="taskInput" />
       </div>
-      <div>
+      <div class="input-wrapper">
         <label for="date"></label>
         <input type="date" v-model="dateInput" />
       </div>
 
-      <br />
-      <button @click="addNewTask">{{ addTask }}</button>
+      <button class="btn" @click="addNewTask">{{ addTask }}</button>
     </form>
   </div>
 </template>
@@ -45,4 +44,17 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.input-wrapper {
+  display: inline-block;
+  margin: 10px;
+}
+input[type='text'],
+input[type='date'] {
+  padding: 15px;
+}
+
+.btn {
+  padding: 15px;
+}
+</style>
