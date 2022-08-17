@@ -13,15 +13,31 @@
     <table>
       <tr>
         <th class="task-data">Task</th>
-        <th class="action-item">#</th>
-        <th class="action-item">#</th>
+        <th class="action-item">Complete</th>
+        <th class="action-item">Delete</th>
       </tr>
       <tbody>
-        <Task
+        <tr
           v-for="(task, index) in tasks"
-          :task="task.taskInput"
           :key="index"
-        />
+          :id="index"
+          :class="{ completed: task.isCompleted }"
+          ref="item"
+        >
+          <td>{{ task.task }}</td>
+          <td class="task-actions">
+            <i
+              class="fa-solid fa-check"
+              @click="completeTask($event, task)"
+            ></i>
+          </td>
+          <td class="task-actions">
+            <i
+              class="fa-solid fa-trash-can"
+              @click="deleteTask($event, index)"
+            ></i>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
@@ -35,11 +51,38 @@ export default {
   components: {},
   data() {
     return {
+      taskInput: '',
       tasks: [],
     };
   },
-  methods: {},
-  mounted() {},
+  methods: {
+    addNewTask(e) {
+      e.preventDefault();
+      this.tasks.push({ task: this.taskInput, isCompleted: false });
+      this.taskInput = '';
+    },
+    completeTask($event, task, index) {
+      task.isCompleted = true;
+    },
+    deleteTask($event, index) {
+      this.tasks.splice(index, 1);
+    },
+  },
+  watch: {
+    tasks: {
+      handler() {
+        localStorage.setItem('tasks', JSON.stringify(this.tasks));
+      },
+      deep: true,
+    },
+  },
+  mounted() {
+    if (!localStorage.getItem('tasks')) {
+      localStorage.setItem('tasks', JSON.stringify(this.tasks));
+    } else {
+      this.tasks = JSON.parse(localStorage.getItem('tasks'));
+    }
+  },
 };
 </script>
 
@@ -86,6 +129,19 @@ td {
 }
 
 .action-item {
-  width: 2%;
+  width: 1%;
+  text-align: center;
+}
+
+.task-actions {
+  text-align: center;
+}
+
+i:hover {
+  cursor: pointer;
+}
+
+.completed {
+  opacity: 0.3;
 }
 </style>
