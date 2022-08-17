@@ -106,13 +106,12 @@ input[type='text'] {
 .btn {
   padding: 15px;
 }
+
 .tasks-container {
-  width: 100%;
   margin-top: 2rem;
 }
 
 table {
-  width: 100%;
   text-align: left;
 }
 
