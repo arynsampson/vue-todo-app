@@ -1,5 +1,5 @@
 <template>
-  <div class="form-wrapper">
+  <div class="form-wrapper" v-if="!editTaskModal">
     <form>
       <div class="input-wrapper">
         <label for="task"></label>
@@ -15,31 +15,44 @@
         <th class="task-data">Task</th>
         <th class="action-item">Complete</th>
         <th class="action-item">Delete</th>
+        <th class="action-item">Edit</th>
       </tr>
       <tbody>
-        <tr
-          v-for="(task, index) in tasks"
-          :key="index"
-          :id="index"
-          :class="{ completed: task.isCompleted }"
-          ref="item"
-        >
-          <td>{{ task.task }}</td>
+        <tr v-for="(task, index) in tasks" :key="index" :id="index" ref="item">
+          <td :class="{ completed: task.isCompleted }">{{ task.task }}</td>
           <td class="task-actions">
             <i
               class="fa-solid fa-check"
-              @click="completeTask($event, task)"
+              @click="completeTask(task)"
+              v-if="!task.isCompleted"
             ></i>
           </td>
           <td class="task-actions">
+            <i class="fa-solid fa-trash-can" @click="deleteTask(index)"></i>
+          </td>
+          <td class="task-actions">
             <i
-              class="fa-solid fa-trash-can"
-              @click="deleteTask($event, index)"
+              class="fa-solid fa-pen-to-square"
+              @click="editTask(task, index)"
             ></i>
           </td>
         </tr>
       </tbody>
     </table>
+  </div>
+
+  <div class="edit-modal" v-if="editTaskModal">
+    <p style="text-align: right" @click="closeEditModal">X</p>
+    <h3>Edit modal</h3>
+    <div class="form-wrapper">
+      <form>
+        <div class="input-wrapper">
+          <label for="task"></label>
+          <input type="text" v-model="taskInput" maxlength="64" required />
+        </div>
+        <button class="btn" @click="updateTask">Update task</button>
+      </form>
+    </div>
   </div>
 </template>
 
@@ -53,6 +66,8 @@ export default {
     return {
       taskInput: '',
       tasks: [],
+      editTaskModal: false,
+      currentEditTaskIndex: 0,
     };
   },
   methods: {
@@ -61,11 +76,24 @@ export default {
       this.tasks.push({ task: this.taskInput, isCompleted: false });
       this.taskInput = '';
     },
-    completeTask($event, task, index) {
+    completeTask(task) {
       task.isCompleted = true;
     },
-    deleteTask($event, index) {
+    deleteTask(index) {
       this.tasks.splice(index, 1);
+    },
+    editTask(task, index) {
+      this.editTaskModal = true;
+      this.currentEditTaskIndex = index;
+      this.taskInput = this.tasks[index].task;
+    },
+    closeEditModal() {
+      this.editTaskModal = false;
+    },
+    updateTask() {
+      this.tasks[this.currentEditTaskIndex].task = this.taskInput;
+      this.editTaskModal = false;
+      this.taskInput = '';
     },
   },
   watch: {
@@ -74,6 +102,10 @@ export default {
         localStorage.setItem('tasks', JSON.stringify(this.tasks));
       },
       deep: true,
+    },
+    taskInput() {
+      if (this.editTaskModal) {
+      }
     },
   },
   mounted() {
@@ -142,5 +174,14 @@ i:hover {
 
 .completed {
   opacity: 0.3;
+}
+
+.edit-modal {
+  width: 50%;
+  margin: 0 auto;
+  border: 1px solid black;
+  border-radius: 20px;
+  margin-top: 15px;
+  padding: 20px;
 }
 </style>
