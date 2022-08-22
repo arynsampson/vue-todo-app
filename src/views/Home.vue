@@ -5,6 +5,10 @@
         <label for="task"></label>
         <input type="text" v-model="taskInput" maxlength="64" required />
       </div>
+      <div class="input-wrapper">
+        <label for="dueDate"></label>
+        <input type="date" v-model="dueDateInput" required />
+      </div>
       <button class="btn" @click="addNewTask">Add task</button>
     </form>
   </div>
@@ -13,6 +17,7 @@
     <table>
       <tr>
         <th class="task-data">Task</th>
+        <th class="task-due-date">Due Date</th>
         <th class="action-item">Complete</th>
         <th class="action-item">Delete</th>
         <th class="action-item">Edit</th>
@@ -20,6 +25,7 @@
       <tbody>
         <tr v-for="(task, index) in tasks" :key="index" :id="index" ref="item">
           <td :class="{ completed: task.isCompleted }">{{ task.task }}</td>
+          <td :class="{ completed: task.isCompleted }">{{ task.dueDate }}</td>
           <td class="task-actions">
             <i
               class="fa-solid fa-check"
@@ -50,6 +56,10 @@
           <label for="task"></label>
           <input type="text" v-model="taskInput" maxlength="64" required />
         </div>
+        <div class="input-wrapper">
+          <label for="dueDate"></label>
+          <input type="date" v-model="dueDateInput" required />
+        </div>
         <button class="btn" @click="updateTask">Update task</button>
       </form>
     </div>
@@ -65,6 +75,7 @@ export default {
   data() {
     return {
       taskInput: '',
+      dueDateInput: '',
       tasks: [],
       editTaskModal: false,
       currentEditTaskIndex: 0,
@@ -73,8 +84,13 @@ export default {
   methods: {
     addNewTask(e) {
       e.preventDefault();
-      this.tasks.push({ task: this.taskInput, isCompleted: false });
+      this.tasks.push({
+        task: this.taskInput,
+        dueDate: this.dueDateInput,
+        isCompleted: false,
+      });
       this.taskInput = '';
+      this.dueDateInput = '';
     },
     completeTask(task) {
       task.isCompleted = true;
@@ -86,14 +102,17 @@ export default {
       this.editTaskModal = true;
       this.currentEditTaskIndex = index;
       this.taskInput = this.tasks[index].task;
+      this.dueDateInput = this.tasks[index].dueDate;
     },
     closeEditModal() {
       this.editTaskModal = false;
     },
     updateTask() {
       this.tasks[this.currentEditTaskIndex].task = this.taskInput;
+      this.tasks[this.currentEditTaskIndex].dueDate = this.dueDateInput;
       this.editTaskModal = false;
       this.taskInput = '';
+      this.dueDateInput = '';
     },
   },
   watch: {
@@ -102,10 +121,6 @@ export default {
         localStorage.setItem('tasks', JSON.stringify(this.tasks));
       },
       deep: true,
-    },
-    taskInput() {
-      if (this.editTaskModal) {
-      }
     },
   },
   mounted() {
@@ -130,7 +145,8 @@ form {
   display: inline-block;
   margin: 10px;
 }
-input[type='text'] {
+input[type='text'],
+input[type='date'] {
   width: 400px;
   padding: 15px;
 }
@@ -157,6 +173,10 @@ td {
 
 .task-data {
   width: 20%;
+}
+
+.task-due-date {
+  width: 4%;
 }
 
 .action-item {
