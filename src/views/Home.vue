@@ -4,12 +4,16 @@
       <div class="input-wrapper">
         <label for="task"></label>
         <input type="text" v-model="taskInput" maxlength="64" />
-        <span v-if="errors.taskErrorBool">{{ errors[0].taskError }}</span>
+        <p class="error" v-if="errors.taskErrorBool">
+          {{ errors[0].taskError }}
+        </p>
       </div>
       <div class="input-wrapper">
         <label for="dueDate"></label>
         <input type="date" v-model="dueDateInput" />
-        <span v-if="errors.dateErrorBool">{{ errors[1].dateError }}</span>
+        <p class="error" v-if="errors.dateErrorBool">
+          {{ errors[1].dateError }}
+        </p>
       </div>
       <button class="btn" @click="addNewTask">Add task</button>
     </form>
@@ -176,19 +180,31 @@ export default {
 }
 form {
   width: 100%;
+  height: 150px;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-start;
 }
 .input-wrapper {
   display: inline-block;
-  margin: 10px;
+  margin: 0 10px;
+  height: 150px;
 }
 input[type='text'],
 input[type='date'] {
-  width: 400px;
+  width: 450px;
   padding: 15px;
+  box-sizing: border-box;
 }
 
 .btn {
   padding: 15px;
+}
+
+.error {
+  margin: 10px;
+  color: red;
 }
 
 .tasks-container {
