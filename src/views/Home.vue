@@ -3,14 +3,26 @@
     <form>
       <div class="input-wrapper">
         <label for="task"></label>
-        <input type="text" v-model="taskInput" maxlength="64" required />
+        <input type="text" v-model="taskInput" maxlength="64" />
+        <span v-if="errors.taskErrorBool">{{ errors[0].taskError }}</span>
       </div>
       <div class="input-wrapper">
         <label for="dueDate"></label>
-        <input type="date" v-model="dueDateInput" required />
+        <input type="date" v-model="dueDateInput" />
+        <span v-if="errors.dateErrorBool">{{ errors[1].dateError }}</span>
       </div>
       <button class="btn" @click="addNewTask">Add task</button>
     </form>
+  </div>
+
+  <div class="input-wrapper">
+    <label for="search"></label>
+    <input
+      type="text"
+      v-model="searchVal"
+      maxlength="64"
+      placeholder="search"
+    />
   </div>
 
   <div class="tasks-container">
@@ -23,7 +35,12 @@
         <th class="action-item">Edit</th>
       </tr>
       <tbody>
-        <tr v-for="(task, index) in tasks" :key="index" :id="index" ref="item">
+        <tr
+          v-for="(task, index) in filteredTasks"
+          :key="index"
+          :id="index"
+          ref="item"
+        >
           <td :class="{ completed: task.isCompleted }">{{ task.task }}</td>
           <td :class="{ completed: task.isCompleted }">{{ task.dueDate }}</td>
           <td class="task-actions">
@@ -40,6 +57,7 @@
             <i
               class="fa-solid fa-pen-to-square"
               @click="editTask(task, index)"
+              v-if="!task.isCompleted"
             ></i>
           </td>
         </tr>
@@ -76,21 +94,34 @@ export default {
     return {
       taskInput: '',
       dueDateInput: '',
+      errors: [
+        { taskError: 'Please enter some text', taskErrorBool: false },
+        { dateError: 'Please enter a date', dateErrorBool: false },
+      ],
       tasks: [],
       editTaskModal: false,
       currentEditTaskIndex: 0,
+      searchVal: '',
     };
   },
   methods: {
     addNewTask(e) {
       e.preventDefault();
-      this.tasks.push({
-        task: this.taskInput,
-        dueDate: this.dueDateInput,
-        isCompleted: false,
-      });
-      this.taskInput = '';
-      this.dueDateInput = '';
+      if (!this.taskInput) {
+        this.errors.taskErrorBool = true;
+      } else if (!this.dueDateInput) {
+        this.errors.dateErrorBool = true;
+      } else {
+        this.tasks.push({
+          task: this.taskInput,
+          dueDate: this.dueDateInput,
+          isCompleted: false,
+        });
+        this.taskInput = '';
+        this.dueDateInput = '';
+        this.errors.taskErrorBool = false;
+        this.errors.dateErrorBool = false;
+      }
     },
     completeTask(task) {
       task.isCompleted = true;
@@ -129,6 +160,11 @@ export default {
     } else {
       this.tasks = JSON.parse(localStorage.getItem('tasks'));
     }
+  },
+  computed: {
+    filteredTasks() {
+      return this.tasks.filter((item) => item.task.includes(this.searchVal));
+    },
   },
 };
 </script>
