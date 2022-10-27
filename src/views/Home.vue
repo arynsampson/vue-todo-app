@@ -4,14 +4,14 @@
       <div class="input-wrapper">
         <label for="task"></label>
         <input type="text" v-model="taskInput" maxlength="64" />
-        <p class="error" v-if="errors.taskErrorBool">
+        <p class="error" v-if="errors[0].errorBool">
           {{ errors[0].taskError }}
         </p>
       </div>
       <div class="input-wrapper">
         <label for="dueDate"></label>
         <input type="date" v-model="dueDateInput" />
-        <p class="error" v-if="errors.dateErrorBool">
+        <p class="error" v-if="errors[1].errorBool">
           {{ errors[1].dateError }}
         </p>
       </div>
@@ -21,12 +21,7 @@
 
   <div class="input-wrapper">
     <label for="search"></label>
-    <input
-      type="text"
-      v-model="searchVal"
-      maxlength="64"
-      placeholder="search"
-    />
+    <input type="text" v-model="searchVal" maxlength="64" placeholder="search" />
   </div>
 
   <div class="tasks-container">
@@ -39,30 +34,17 @@
         <th class="action-item">Edit</th>
       </tr>
       <tbody>
-        <tr
-          v-for="(task, index) in filteredTasks"
-          :key="index"
-          :id="index"
-          ref="item"
-        >
+        <tr v-for="(task, index) in tasks" :key="index" :id="index">
           <td :class="{ completed: task.isCompleted }">{{ task.task }}</td>
           <td :class="{ completed: task.isCompleted }">{{ task.dueDate }}</td>
           <td class="task-actions">
-            <i
-              class="fa-solid fa-check"
-              @click="completeTask(task)"
-              v-if="!task.isCompleted"
-            ></i>
+            <i class="fa-solid fa-check" @click="completeTask(task)" v-if="!task.isCompleted"></i>
           </td>
           <td class="task-actions">
             <i class="fa-solid fa-trash-can" @click="deleteTask(index)"></i>
           </td>
           <td class="task-actions">
-            <i
-              class="fa-solid fa-pen-to-square"
-              @click="editTask(task, index)"
-              v-if="!task.isCompleted"
-            ></i>
+            <i class="fa-solid fa-pen-to-square" @click="editTask(task, index)" v-if="!task.isCompleted"></i>
           </td>
         </tr>
       </tbody>
@@ -88,89 +70,88 @@
   </div>
 </template>
 
-<script>
-// @ is an alias to /src
+<script setup>
+import { ref, reactive, computed, watch, onMounted } from 'vue';
 
-export default {
-  name: 'Home',
-  components: {},
-  data() {
-    return {
-      taskInput: '',
-      dueDateInput: '',
-      errors: [
-        { taskError: 'Please enter some text', taskErrorBool: false },
-        { dateError: 'Please enter a date', dateErrorBool: false },
-      ],
-      tasks: [],
-      editTaskModal: false,
-      currentEditTaskIndex: 0,
-      searchVal: '',
-    };
-  },
-  methods: {
-    addNewTask(e) {
-      e.preventDefault();
-      if (!this.taskInput) {
-        this.errors.taskErrorBool = true;
-      } else if (!this.dueDateInput) {
-        this.errors.dateErrorBool = true;
-      } else {
-        this.tasks.push({
-          task: this.taskInput,
-          dueDate: this.dueDateInput,
-          isCompleted: false,
-        });
-        this.taskInput = '';
-        this.dueDateInput = '';
-        this.errors.taskErrorBool = false;
-        this.errors.dateErrorBool = false;
-      }
-    },
-    completeTask(task) {
-      task.isCompleted = true;
-    },
-    deleteTask(index) {
-      this.tasks.splice(index, 1);
-    },
-    editTask(task, index) {
-      this.editTaskModal = true;
-      this.currentEditTaskIndex = index;
-      this.taskInput = this.tasks[index].task;
-      this.dueDateInput = this.tasks[index].dueDate;
-    },
-    closeEditModal() {
-      this.editTaskModal = false;
-    },
-    updateTask() {
-      this.tasks[this.currentEditTaskIndex].task = this.taskInput;
-      this.tasks[this.currentEditTaskIndex].dueDate = this.dueDateInput;
-      this.editTaskModal = false;
-      this.taskInput = '';
-      this.dueDateInput = '';
-    },
-  },
-  watch: {
-    tasks: {
-      handler() {
-        localStorage.setItem('tasks', JSON.stringify(this.tasks));
-      },
-      deep: true,
-    },
-  },
-  mounted() {
-    if (!localStorage.getItem('tasks')) {
-      localStorage.setItem('tasks', JSON.stringify(this.tasks));
-    } else {
-      this.tasks = JSON.parse(localStorage.getItem('tasks'));
-    }
-  },
-  computed: {
-    filteredTasks() {
-      return this.tasks.filter((item) => item.task.includes(this.searchVal));
-    },
-  },
+const taskInput = ref('');
+const dueDateInput = ref(null);
+const errors = reactive([
+  { taskError: 'Please enter some text', errorBool: false },
+  { dateError: 'Please enter a date', errorBool: false },
+]);
+const tasks = ref([]);
+const editTaskModal = ref(false);
+const currentEditTaskIndex = ref(0);
+const searchVal = ref('');
+
+const addNewTask = (e) => {
+  e.preventDefault();
+  if (!taskInput.value) {
+    errors[0].errorBool = true;
+  } else if (!dueDateInput.value) {
+    errors[1].errorBool = true;
+  } else {
+    tasks.value.push({
+      task: taskInput.value,
+      dueDate: dueDateInput.value,
+      isCompleted: false,
+    });
+    taskInput.value = '';
+    dueDateInput.value = '';
+    errors[0].errorBool = false;
+    errors[1].errorBool = false;
+  }
 };
+
+const completeTask = (task) => {
+  task.isCompleted = true;
+};
+
+const deleteTask = (index) => {
+  tasks.value.splice(index, 1);
+};
+
+const editTask = (task, index) => {
+  editTaskModal.value = true;
+  currentEditTaskIndex.value = index;
+  taskInput.value = tasks.value[index].task;
+  dueDateInput.value = tasks.value[index].dueDate;
+};
+
+const updateTask = (e) => {
+  e.preventDefault();
+  tasks.value[currentEditTaskIndex.value].task = taskInput.value;
+  tasks.value[currentEditTaskIndex.value].dueDate = dueDateInput.value;
+  editTaskModal.value = false;
+  taskInput.value = '';
+  dueDateInput.value = '';
+};
+
+const closeEditModal = () => {
+  editTaskModal.value = false;
+};
+
+const filteredTasks = computed(() => {
+  return tasks.value.filter((item) => item.task.includes(searchVal.value));
+});
+
+watch(
+  tasks,
+  (newVal, oldVal) => {
+    localStorage.setItem('tasks', JSON.stringify(tasks.value));
+  },
+  {
+    deep: true,
+  }
+);
+
+onMounted(() => {
+  if (!localStorage.getItem('tasks')) {
+    localStorage.setItem('tasks', JSON.stringify(tasks.value));
+  } else {
+    tasks.value = JSON.parse(localStorage.getItem('tasks'));
+  }
+});
 </script>
 
 <style>
