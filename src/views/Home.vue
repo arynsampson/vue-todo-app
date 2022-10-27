@@ -34,7 +34,7 @@
         <th class="action-item">Edit</th>
       </tr>
       <tbody>
-        <tr v-for="(task, index) in tasks" :key="index" :id="index">
+        <tr v-for="(task, index) in filteredTasks" :key="index" :id="index">
           <td :class="{ completed: task.isCompleted }">{{ task.task }}</td>
           <td :class="{ completed: task.isCompleted }">{{ task.dueDate }}</td>
           <td class="task-actions">
