@@ -39,7 +39,13 @@
             <div @click="toggleContextMenu(task, index)" class="context-menu-cell">
               <p class="context-menu-toggle">CM</p>
               <div class="context-menu">
-                <Context v-if="task.contextMenu" :task="task" :index="index" :id="index" />
+                <Context
+                  v-if="task.contextMenu"
+                  :task="task"
+                  @completeTaskEmit="completeTask(task)"
+                  @deleteTaskEmit="deleteTask(index)"
+                  @editTaskEmit="editTask(task, index)"
+                />
               </div>
             </div>
           </td>
@@ -260,7 +266,11 @@ i:hover {
   left: 70px;
   top: -20px;
   z-index: 1;
-  /* padding: 0;
-  margin: 0; */
+}
+
+.edit-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 </style>
