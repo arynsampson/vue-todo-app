@@ -30,21 +30,18 @@
         <th class="task-data">Task</th>
         <th class="task-due-date">Due Date</th>
         <th class="action-item">Complete</th>
-        <th class="action-item">Delete</th>
-        <th class="action-item">Edit</th>
       </tr>
       <tbody>
         <tr v-for="(task, index) in filteredTasks" :key="index" :id="index">
           <td :class="{ completed: task.isCompleted }">{{ task.task }}</td>
           <td :class="{ completed: task.isCompleted }">{{ task.dueDate }}</td>
           <td class="task-actions">
-            <i class="fa-solid fa-check" @click="completeTask(task)" v-if="!task.isCompleted"></i>
-          </td>
-          <td class="task-actions">
-            <i class="fa-solid fa-trash-can" @click="deleteTask(index)"></i>
-          </td>
-          <td class="task-actions">
-            <i class="fa-solid fa-pen-to-square" @click="editTask(task, index)" v-if="!task.isCompleted"></i>
+            <div @click="toggleContextMenu(task, index)" class="context-menu-cell">
+              <p class="context-menu-toggle">CM</p>
+              <div class="context-menu">
+                <Context v-if="task.contextMenu" :task="task" :index="index" :id="index" />
+              </div>
+            </div>
           </td>
         </tr>
       </tbody>
@@ -72,6 +69,7 @@
 
 <script setup>
 import { ref, reactive, computed, watch, onMounted } from 'vue';
+import Context from '../components/context.vue';
 
 const taskInput = ref('');
 const dueDateInput = ref(null);
@@ -84,6 +82,16 @@ const editTaskModal = ref(false);
 const currentEditTaskIndex = ref(0);
 const searchVal = ref('');
 
+const toggleContextMenu = (currTask, index) => {
+  tasks.value.forEach((task) => {
+    if (tasks.value.indexOf(task) !== index) {
+      task.contextMenu = false;
+    } else {
+      currTask.contextMenu = !currTask.contextMenu;
+    }
+  });
+};
+
 const addNewTask = (e) => {
   e.preventDefault();
   if (!taskInput.value) {
@@ -95,6 +103,7 @@ const addNewTask = (e) => {
       task: taskInput.value,
       dueDate: dueDateInput.value,
       isCompleted: false,
+      contextMenu: false,
     });
     taskInput.value = '';
     dueDateInput.value = '';
@@ -236,5 +245,22 @@ i:hover {
   border-radius: 20px;
   margin-top: 15px;
   padding: 20px;
+}
+
+.context-menu-cell {
+  position: relative;
+}
+
+.context-menu-toggle {
+  margin: 0;
+}
+
+.context-menu {
+  position: absolute;
+  left: 70px;
+  top: -20px;
+  z-index: 1;
+  /* padding: 0;
+  margin: 0; */
 }
 </style>
