@@ -1,12 +1,18 @@
 <template>
   <div class="context-menu-wrapper">
     <ul class="menu-items-list">
-      <li class="menu-item" @click="completeTask">Complete</li>
-      <li class="menu-item" @click="deleteTask">Delete</li>
-      <li class="menu-item" @click="editTask">Edit</li>
+      <li class="menu-item" @click="$emit('completeTaskEmit')" v-if="!task.isCompleted">Complete</li>
+      <li class="menu-item" @click="$emit('deleteTaskEmit')">Delete</li>
+      <li class="menu-item" @click="$emit('editTaskEmit')" v-if="!task.isCompleted">Edit</li>
     </ul>
   </div>
 </template>
+
+<script setup>
+const props = defineProps({
+  task: Object,
+});
+</script>
 
 <style>
 .context-menu-wrapper {
